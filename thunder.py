@@ -13,23 +13,20 @@ def handler(methods):
     '''
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
-            def get(self):
-                if len(inspect.getargspec(methods['get']).args) == 0:
-                    self.write(methods['get'])
-                elif len(inspect.getargspec(methods['get']).args) == 1:
-                    self.write(methods['get'](self.request))
+            def get(self, *args, **kwargs):
+                if inspect.getargspec(methods['get']).args[0] == 'request':
+                    args = (self.request, ) + args
+                self.write(methods['get'](*args, **kwargs))
         if 'post' in methods.keys():
-            def post(self):
-                if len(inspect.getargspec(methods['post']).args) == 0:
-                    self.write(methods['post'])
-                elif len(inspect.getargspec(methods['post']).args) == 1:
-                    self.write(methods['post'](self.request))
+            def post(self, *args, **kwargs):
+                if inspect.getargspec(methods['post']).args[0] == 'request':
+                    args = (self.request, ) + args
+                self.write(methods['post'](*args, **kwargs))
         if 'put' in methods.keys():
-            def put(self):
-                if len(inspect.getargspec(methods['put']).args) == 0:
-                    self.write(methods['put'])
-                elif len(inspect.getargspec(methods['put']).args) == 1:
-                    self.write(methods['put'](self.request))
+            def put(self, *args, **kwargs):
+                if inspect.getargspec(methods['put']).args[0] == 'request':
+                    args = (self.request, ) + args
+                self.write(methods['put'](*args, **kwargs))
     return Handler
 
 
@@ -73,19 +70,22 @@ def put(path='/'):
 
 # move to test
 @post('/test')
-def headers(request):
+def echo(request):
     '''echo back the headers'''
     return str(request.body)
 
+# should work with named parameters
+#?P<param1>
 # move to test
-@get('/test')
-def headers(request):
+@get('/test/([^\/]+)/')
+def headers(request, param):
     '''echo back the headers'''
+    print("Got param: {}".format(param))
     return str(request.headers)
 
 # move to test
 @put('/test')
-def headers(request):
+def put_echo(request):
     '''echo back the headers'''
     return str(request.body)
 
