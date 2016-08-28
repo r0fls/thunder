@@ -11,6 +11,7 @@ def handler(methods):
     Returns a tornado handler with get method defined by the function passed
     via the get decorator
     '''
+    #class Handler(tornado.web.RequestHandler):
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
@@ -35,7 +36,6 @@ def get(path='/'):
     '''
     Adds a function and optional path to global env instance
     '''
-    # this should match against existing env and append to existing ones
     def _get(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
@@ -47,7 +47,6 @@ def post(path='/'):
     '''
     Adds a function and optional path to global env instance
     '''
-    # this should match against existing env and append to existing ones
     def _post(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
@@ -59,14 +58,12 @@ def put(path='/'):
     '''
     Adds a function and optional path to global env instance
     '''
-    # this should match against existing env and append to existing ones
     def _put(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
         #env.add_handlers(r".*", [(path, get_handler(func_to_decorate))])
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
-
 
 # move to test
 @post('/test')
@@ -83,13 +80,20 @@ def headers(request, param):
     print("Got param: {}".format(param))
     return str(request.headers)
 
+# this should turn into a capture group
+# and pass to the function
+#@get('/hello/{str:name}/{int:age}')
+#def headers(name, age):
+#    '''echo back the headers'''
+#    return str("hello, {0}. Are you {1}?".format(name, age))
+
 # move to test
 @put('/test')
 def put_echo(request):
     '''echo back the headers'''
     return str(request.body)
 
-def start(port=8888):
+def prepare():
     apps = defaultdict(dict)
     for key, value in app:
         if value[0] in apps[key].keys():
@@ -99,6 +103,9 @@ def start(port=8888):
     for key in apps.keys():
         for path in apps[key]:
             env.add_handlers(key, [(path, handler(dict(apps[key][path])))])
+
+def start(port=8888):
+    prepare()
     env.listen(port)
     tornado.ioloop.IOLoop.current().start()
 
