@@ -68,12 +68,6 @@ def put(path='/'):
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
 
-# move to test
-@post('/test')
-def echo(request):
-    '''echo back the headers'''
-    return str(request.body)
-
 # should work with named parameters
 #?P<param1>
 # move to test
@@ -82,19 +76,6 @@ def headers(request, param1):
     '''echo back the headers'''
     print("Got param: {}".format(param1))
     return str(request.headers)
-
-# this should turn into a capture group
-# and pass to the function
-#@get('/hello/{str:name}/{int:age}')
-#def headers(name, age):
-#    '''echo back the headers'''
-#    return str("hello, {0}. Are you {1}?".format(name, age))
-
-# move to test
-@put('/test')
-def put_echo(request):
-    '''echo back the headers'''
-    return str(request.body)
 
 def prepare():
     apps = defaultdict(dict)
@@ -113,6 +94,18 @@ def start(port=8888):
     return tornado.ioloop.IOLoop.current().start()
 
 def stop():
-        env.tornado.ioloop.IOLoop.instance().stop()
+        tornado.ioloop.IOLoop.instance().stop()
+
 if __name__ == "__main__":
+    import signal
+    import sys
+
+    def signal_handler(signal, frame):
+        print('\nStopping Thunder')
+        stop()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
     start()
+    print('Thunder running...\nPress Ctrl+C to exit')
+    signal.pause()
