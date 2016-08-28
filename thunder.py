@@ -15,17 +15,20 @@ def handler(methods):
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
-                if inspect.getargspec(methods['get']).args[0] == 'request':
+                if len(inspect.getargspec(methods['get']).args) > 0 and \
+                        inspect.getargspec(methods['get']).args[0] == 'request':
                     args = (self.request, ) + args
                 self.write(methods['get'](*args, **kwargs))
         if 'post' in methods.keys():
             def post(self, *args, **kwargs):
-                if inspect.getargspec(methods['post']).args[0] == 'request':
+                if len(inspect.getargspec(methods['post']).args) > 0 and \
+                        inspect.getargspec(methods['post']).args[0] == 'request':
                     args = (self.request, ) + args
                 self.write(methods['post'](*args, **kwargs))
         if 'put' in methods.keys():
             def put(self, *args, **kwargs):
-                if inspect.getargspec(methods['put']).args[0] == 'request':
+                if len(inspect.getargspec(methods['put']).args) > 0 and \
+                        inspect.getargspec(methods['put']).args[0] == 'request':
                     args = (self.request, ) + args
                 self.write(methods['put'](*args, **kwargs))
     return Handler
@@ -75,9 +78,9 @@ def echo(request):
 #?P<param1>
 # move to test
 @get('/test/([^\/]+)/')
-def headers(request, param):
+def headers(request, param1):
     '''echo back the headers'''
-    print("Got param: {}".format(param))
+    print("Got param: {}".format(param1))
     return str(request.headers)
 
 # this should turn into a capture group
@@ -107,7 +110,9 @@ def prepare():
 def start(port=8888):
     prepare()
     env.listen(port)
-    tornado.ioloop.IOLoop.current().start()
+    return tornado.ioloop.IOLoop.current().start()
 
+def stop():
+        env.tornado.ioloop.IOLoop.instance().stop()
 if __name__ == "__main__":
     start()
