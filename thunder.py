@@ -77,7 +77,7 @@ def headers(request, param1):
     print("Got param: {}".format(param1))
     return str(request.headers)
 
-def prepare():
+def make_app():
     apps = defaultdict(dict)
     for key, value in app:
         if value[0] in apps[key].keys():
@@ -87,9 +87,10 @@ def prepare():
     for key in apps.keys():
         for path in apps[key]:
             env.add_handlers(key, [(path, handler(dict(apps[key][path])))])
+    return env
 
 def start(port=8888):
-    prepare()
+    make_app()
     env.listen(port)
     return tornado.ioloop.IOLoop.current().start()
 
