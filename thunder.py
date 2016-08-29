@@ -92,12 +92,20 @@ def make_app():
 def start(port=8888):
     make_app()
     env.listen(port)
-    return tornado.ioloop.IOLoop.current().start()
+    tornado.ioloop.IOLoop.current().start()
 
 def stop():
-        tornado.ioloop.IOLoop.instance().stop()
+    tornado.ioloop.IOLoop.instance().stop()
 
-if __name__ == "__main__":
+START ="""\
+ _____ _                     _             ____       _ _
+|_   _| |__  _   _ _ __   __| | ___ _ __  |  _ \ ___ | | |___
+  | | | '_ \| | | | '_ \ / _` |/ _ \ '__| | |_) / _ \| | / __|
+  | | | | | | | |_| | | | | (_| | _/ |    |  _ < (_) | | \__ \\
+  |_| |_| |_|\__,_|_| |_|\__,_|\___|_|    |_| \_\___/|_|_|___/
+"""
+
+def run(port=8888):
     import signal
     import sys
 
@@ -107,6 +115,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
-    start()
-    print('Thunder running...\nPress Ctrl+C to exit')
+    print('{}\nThunder is running...\nPress Ctrl+C to exit'.format(START))
+    start(port)
     signal.pause()
+
+if __name__ == "__main__":
+    run()
