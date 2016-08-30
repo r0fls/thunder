@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import inspect
 from collections import defaultdict
+import re
 
 app = []
 env = tornado.web.Application()
@@ -63,6 +64,15 @@ def put(path='/'):
             return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
+
+def args(string):
+    if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
+        return re.sub(re.compile(r'(.*)?{[0-9]*}(.*)'), r'\1([^\/]+)\2', string)
+
+    elif re.match(re.compile(r'(.*){[^0-9].*}(.*)'), string):
+        return re.sub(re.compile(r'(.*){[^0-9](.*)}(.*)'), r'\1(?<\2>[^\/]+)/\3', string)
+    else:
+        return string
 
 def make_app():
     apps = defaultdict(dict)
