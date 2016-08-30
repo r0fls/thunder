@@ -11,7 +11,6 @@ def handler(methods):
     Returns a tornado handler with get method defined by the function passed
     via the get decorator
     '''
-    #class Handler(tornado.web.RequestHandler):
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
@@ -37,45 +36,33 @@ def handler(methods):
 # Decorators
 def get(path='/'):
     '''
-    Adds a function and optional path to global env instance
+    Adds a function and optional path to the global app variable
     '''
     def _get(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
-        #env.add_handlers(r".*", [(path, get_handler(func_to_decorate))])
         app.append([r".*", [path, 'get', func_to_decorate]])
     return _get
 
 def post(path='/'):
     '''
-    Adds a function and optional path to global env instance
+    Adds a function and optional path to the global app variable
     '''
     def _post(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
-        #env.add_handlers(r".*", [(path, get_handler(func_to_decorate))])
         app.append([r".*", [path, 'post', func_to_decorate]])
     return _post
 
 def put(path='/'):
     '''
-    Adds a function and optional path to global env instance
+    Adds a function and optional path to the global app variable
     '''
     def _put(func_to_decorate):
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
-        #env.add_handlers(r".*", [(path, get_handler(func_to_decorate))])
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
-
-# should work with named parameters
-#?P<param1>
-# move to test
-@get('/test/([^\/]+)/')
-def headers(request, param1):
-    '''echo back the headers'''
-    print("Got param: {}".format(param1))
-    return str(request.headers)
 
 def make_app():
     apps = defaultdict(dict)
