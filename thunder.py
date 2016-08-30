@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import inspect
 from collections import defaultdict
+import re
 
 app = []
 env = tornado.web.Application()
@@ -76,6 +77,15 @@ def headers(request, param1):
     '''echo back the headers'''
     print("Got param: {}".format(param1))
     return str(request.headers)
+
+def args(string):
+    if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
+        return re.sub(re.compile(r'(.*)?{[0-9]*}(.*)'), r'\1([^\/]+)\2', string)
+
+    elif re.match(re.compile(r'(.*){[^0-9].*}(.*)'), string):
+        return re.sub(re.compile(r'(.*){[^0-9](.*)}(.*)'), r'\1(?<\2>[^\/]+)/\3', string)
+    else:
+        return string
 
 def make_app():
     apps = defaultdict(dict)
