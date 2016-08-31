@@ -152,10 +152,4 @@ def run(port=8888):
     signal.pause()
 
 if __name__ == "__main__":
-    @get('/test/{name}/')
-    def named(request, name):
-        return name
-    @get('/other/{0}/')
-    def named(request, name):
-        return name
     run()
