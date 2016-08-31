@@ -85,12 +85,17 @@ def patch(path='/'):
     return _patch
 
 def args(string):
+    """
+    Transforms a route from {} to regex
+    """
     # if there is a variable to be substituted, do so recursively
     while re.match(re.compile(r'(.*){[0-9]*}(.*)'), string) or \
             re.match(re.compile(r'(.*){.*}(.*)'), string):
+        # indexed parameters
         if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
             return args(re.sub(re.compile(r'(.*){[0-9]*}(.*)'),
                                r'\1([^\/]+)\2', string))
+        # named parameters
         elif re.match(re.compile(r'(.*){.*}(.*)'), string):
             return args(re.sub(re.compile(r'(.*){(.*)}(.*)'),
                                r'\1(?P<\2>[^\/]+)\3', string))

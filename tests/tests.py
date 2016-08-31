@@ -39,35 +39,35 @@ class ThunderTests(AsyncHTTPTestCase):
 
     def test_http_get(self):
         response = self.fetch('/', method="GET")
-        self.assertEqual("hello", response.body)
+        self.assertEqual(b"hello", response.body)
 
     def test_http_post(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="POST")
-        self.assertEqual({"testing":"12"}, json.loads(response.body))
+        self.assertEqual({"testing":"12"}, json.loads(response.body.decode('utf8')))
 
     def test_http_put(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PUT")
-        self.assertEqual({"testing":"12"}, json.loads(response.body))
+        self.assertEqual({"testing":"12"}, json.loads(response.body.decode('utf8')))
 
     def test_http_patch(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PATCH")
-        self.assertEqual({"testing":"12"}, json.loads(response.body))
+        self.assertEqual({"testing":"12"}, json.loads(response.body.decode('utf8')))
 
     def test_http_numbered_params(self):
         response = self.fetch('/test/something/', method="GET")
-        self.assertEqual("something", response.body)
+        self.assertEqual(b"something", response.body)
 
     def test_http_named_params(self):
         response = self.fetch('/other/test/something/', method="GET")
-        self.assertEqual("something", response.body)
+        self.assertEqual(b"something", response.body)
 
     def test_http_named_params_no_slash(self):
         response = self.fetch('/other/test/something', method="GET")
-        self.assertEqual("something", response.body)
+        self.assertEqual(b"something", response.body)
 
     def test_http_many_named_params(self):
         response = self.fetch('/other/test/raphael/30/', method="GET")
-        self.assertEqual("You are 30 and your name is raphael", response.body)
+        self.assertEqual(b"You are 30 and your name is raphael", response.body)
 
 if __name__=="__main__":
     unittest.main()
