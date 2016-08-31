@@ -67,9 +67,11 @@ def put(path='/'):
 
 def args(string):
     if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
-        return args(re.sub(re.compile(r'(.*)?{[0-9]*}(.*)'), r'\1([^\/]+)\2', string))
+        return args(re.sub(re.compile(r'(.*){[0-9]*}(.*)'),
+                           r'\1([^\/]+)\2/?', string))
     elif re.match(re.compile(r'(.*){.*}(.*)'), string):
-        return args(re.sub(re.compile(r'(.*){(.*)}(.*)'), r'\1(?<\2>[^\/]+)/\3', string))
+        return args(re.sub(re.compile(r'(.*){(.*)}(.*)'),
+                           r'\1(?P<\2>[^\/]+)\3/?', string))
     else:
         return string
 
@@ -82,11 +84,19 @@ def make_app():
             apps[key][value[0]] = [value[1:]]
     for key in apps.keys():
         for path in apps[key]:
-            env.add_handlers(key, [(args(path), handler(dict(apps[key][path])))])
+            try:
+
+                env.add_handlers(key, [(args(path).decode('string_escape'),
+                                        handler(dict(apps[key][path])))])
+            except Exception as e:
+                 s = ("there was a problem adding {0} "
+                        "{1} {2}\n {3}")
+                 print(s.format(key, path, apps[key][path], e))
     return env
 
 def start(port=8888):
     make_app()
+    #import pdb; pdb.set_trace()
     env.listen(port)
     tornado.ioloop.IOLoop.current().start()
 
@@ -111,9 +121,15 @@ def run(port=8888):
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
-    print('{}\nThunder is running...\nPress Ctrl+C to exit'.format(START))
+    print('{0}\nThunder is running on port {1}...\nPress Ctrl+C to exit'.format(START, port))
     start(port)
     signal.pause()
 
 if __name__ == "__main__":
+    @get('/test/{name}/')
+    def named(request, name):
+        return name
+    @get('/other/{0}/')
+    def named(request, name):
+        return name
     run()
