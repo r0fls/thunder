@@ -82,7 +82,9 @@ def args(string):
         else:
             return string
     # there was no match, just resturn the string
-    return string
+    if string[-1] == '/':
+        return '{}*'.format(string)
+    return '{}/*'.format(string)
 
 def make_app():
     apps = defaultdict(dict)

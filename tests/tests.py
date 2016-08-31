@@ -51,6 +51,10 @@ class ThunderTests(AsyncHTTPTestCase):
         response = self.fetch('/other/test/something/', method="GET")
         self.assertEqual("something", response.body)
 
+    def test_http_named_params_no_slash(self):
+        response = self.fetch('/other/test/something', method="GET")
+        self.assertEqual("something", response.body)
+
     def test_http_many_named_params(self):
         response = self.fetch('/other/test/raphael/30/', method="GET")
         self.assertEqual("You are 30 and your name is raphael", response.body)
