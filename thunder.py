@@ -4,6 +4,10 @@ import inspect
 from collections import defaultdict
 import re
 
+# TODO
+# - Improve Regex param routing
+# - Authentication
+
 app = []
 env = tornado.web.Application()
 
@@ -66,14 +70,19 @@ def put(path='/'):
     return _put
 
 def args(string):
-    if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
-        return args(re.sub(re.compile(r'(.*){[0-9]*}(.*)'),
-                           r'\1([^\/]+)\2/?', string))
-    elif re.match(re.compile(r'(.*){.*}(.*)'), string):
-        return args(re.sub(re.compile(r'(.*){(.*)}(.*)'),
-                           r'\1(?P<\2>[^\/]+)\3/?', string))
-    else:
-        return string
+    # if there is a variable to be substituted, do so recursively
+    while re.match(re.compile(r'(.*){[0-9]*}(.*)'), string) or \
+            re.match(re.compile(r'(.*){.*}(.*)'), string):
+        if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
+            return args(re.sub(re.compile(r'(.*){[0-9]*}(.*)'),
+                               r'\1([^\/]+)\2', string))
+        elif re.match(re.compile(r'(.*){.*}(.*)'), string):
+            return args(re.sub(re.compile(r'(.*){(.*)}(.*)'),
+                               r'\1(?P<\2>[^\/]+)\3', string))
+        else:
+            return string
+    # there was no match, just resturn the string
+    return string
 
 def make_app():
     apps = defaultdict(dict)
@@ -86,7 +95,7 @@ def make_app():
         for path in apps[key]:
             try:
 
-                env.add_handlers(key, [(args(path).decode('string_escape'),
+                env.add_handlers(key, [(args(path),
                                         handler(dict(apps[key][path])))])
             except Exception as e:
                  s = ("there was a problem adding {0} "
