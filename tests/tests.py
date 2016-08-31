@@ -7,9 +7,15 @@ import tornado
 @thunder.get()
 def hello():
     return "hello"
+
 @thunder.post()
 def echo(request):
     return request.body
+
+@thunder.patch()
+def echo(request):
+    return request.body
+
 @thunder.put()
 def echo(request):
     return request.body
@@ -41,6 +47,10 @@ class ThunderTests(AsyncHTTPTestCase):
 
     def test_http_put(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PUT")
+        self.assertEqual({"testing":"12"}, json.loads(response.body))
+
+    def test_http_patch(self):
+        response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PATCH")
         self.assertEqual({"testing":"12"}, json.loads(response.body))
 
     def test_http_numbered_params(self):

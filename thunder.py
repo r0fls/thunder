@@ -5,7 +5,6 @@ from collections import defaultdict
 import re
 
 # TODO
-# - Improve Regex param routing
 # - Authentication
 
 app = []
@@ -35,6 +34,12 @@ def handler(methods):
                         inspect.getargspec(methods['put']).args[0] == 'request':
                     args = (self.request, ) + args
                 self.write(methods['put'](*args, **kwargs))
+        if 'patch' in methods.keys():
+            def patch(self, *args, **kwargs):
+                if len(inspect.getargspec(methods['patch']).args) > 0 and \
+                        inspect.getargspec(methods['patch']).args[0] == 'request':
+                    args = (self.request, ) + args
+                self.write(methods['patch'](*args, **kwargs))
     return Handler
 
 
@@ -68,6 +73,16 @@ def put(path='/'):
             return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
+
+def patch(path='/'):
+    '''
+    Adds a function and optional path to the global app variable
+    '''
+    def _patch(func_to_decorate):
+        def new_func(*original_args, **original_kwargs):
+            return func_to_decorate(*original_args, **original_kwargs)
+        app.append([r".*", [path, 'patch', func_to_decorate]])
+    return _patch
 
 def args(string):
     # if there is a variable to be substituted, do so recursively
