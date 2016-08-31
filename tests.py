@@ -7,26 +7,21 @@ import tornado
 @thunder.get()
 def hello():
     return "hello"
-
 @thunder.post()
 def echo(request):
     return request.body
-
 @thunder.put()
 def echo(request):
     return request.body
-
-@thunder.get('/test/?P<param1>([^\/]+)/')
-def named(request, param1):
-    '''echo back the parameter'''
-    return param1
+@thunder.get('/test/{0}/')
+def named(request, param):
+    return param
 
 class ThunderTests(AsyncHTTPTestCase):
     # required setup
     def get_app(self):
         return thunder.make_app()
 
-    # test get
     def test_http_get(self):
         response = self.fetch('/', method="GET")
         self.assertEqual("hello", response.body)

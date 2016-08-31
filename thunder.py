@@ -67,10 +67,9 @@ def put(path='/'):
 
 def args(string):
     if re.match(re.compile(r'(.*){[0-9]*}(.*)'), string):
-        return re.sub(re.compile(r'(.*)?{[0-9]*}(.*)'), r'\1([^\/]+)\2', string)
-
-    elif re.match(re.compile(r'(.*){[^0-9].*}(.*)'), string):
-        return re.sub(re.compile(r'(.*){[^0-9](.*)}(.*)'), r'\1(?<\2>[^\/]+)/\3', string)
+        return args(re.sub(re.compile(r'(.*)?{[0-9]*}(.*)'), r'\1([^\/]+)\2', string))
+    elif re.match(re.compile(r'(.*){.*}(.*)'), string):
+        return args(re.sub(re.compile(r'(.*){(.*)}(.*)'), r'\1(?<\2>[^\/]+)/\3', string))
     else:
         return string
 
@@ -83,7 +82,7 @@ def make_app():
             apps[key][value[0]] = [value[1:]]
     for key in apps.keys():
         for path in apps[key]:
-            env.add_handlers(key, [(path, handler(dict(apps[key][path])))])
+            env.add_handlers(key, [(args(path), handler(dict(apps[key][path])))])
     return env
 
 def start(port=8888):
