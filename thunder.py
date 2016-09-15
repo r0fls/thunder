@@ -152,7 +152,6 @@ def make_app():
 
 def start(port=8888):
     make_app()
-    #import pdb; pdb.set_trace()
     env.listen(port)
     tornado.ioloop.IOLoop.current().start()
 

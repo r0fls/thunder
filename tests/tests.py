@@ -48,7 +48,7 @@ class ThunderTests(AsyncHTTPTestCase):
 
     def test_http_headers_get(self):
         response = self.fetch('/headers', method="GET")
-        self.assertEqual(b"world", response.headers["hello"])
+        self.assertEqual("world", response.headers["hello"])
 
     def test_http_post(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="POST")
