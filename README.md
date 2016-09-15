@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/r0fls/commander.png)](https://travis-ci.org/r0fls/commander)
+[![Build Status](https://travis-ci.org/r0fls/thunder.png)](https://travis-ci.org/r0fls/thunder)
 # thunder
 api decorators for tornado
 
