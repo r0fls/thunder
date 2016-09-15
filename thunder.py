@@ -10,6 +10,7 @@ import re
 app = []
 env = tornado.web.Application()
 
+
 def handler(methods):
     '''
     Returns a tornado handler with get method defined by the function passed
@@ -18,27 +19,51 @@ def handler(methods):
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
-                if len(inspect.getargspec(methods['get']).args) > 0 and \
-                        inspect.getargspec(methods['get']).args[0] == 'request':
-                    args = (self.request, ) + args
+                func_args = inspect.getargspec(methods['get']).args
+                req_index = func_args.index("request") if "request" in func_args else -1
+                res_index = func_args.index("response") if "response" in func_args else -1
+                if res_index > -1:
+                    args = args[:res_index] + (self, ) + args[res_index:]
+                    if req_index > -1:
+                        args = args[:req_index] + (self.request, ) + args[req_index:]
+                elif req_index > -1:
+                    args = args[:req_index] + (self.request, ) + args[req_index:]
                 self.write(methods['get'](*args, **kwargs))
         if 'post' in methods.keys():
             def post(self, *args, **kwargs):
-                if len(inspect.getargspec(methods['post']).args) > 0 and \
-                        inspect.getargspec(methods['post']).args[0] == 'request':
-                    args = (self.request, ) + args
+                func_args = inspect.getargspec(methods['post']).args
+                req_index = func_args.index("request") if "request" in func_args else -1
+                res_index = func_args.index("response") if "response" in func_args else -1
+                if res_index > -1:
+                    args = args[:res_index] + (self, ) + args[res_index:]
+                    if req_index > -1:
+                        args = args[:req_index] + (self.request, ) + args[req_index:]
+                elif req_index > -1:
+                    args = args[:req_index] + (self.request, ) + args[req_index:]
                 self.write(methods['post'](*args, **kwargs))
         if 'put' in methods.keys():
             def put(self, *args, **kwargs):
-                if len(inspect.getargspec(methods['put']).args) > 0 and \
-                        inspect.getargspec(methods['put']).args[0] == 'request':
-                    args = (self.request, ) + args
+                func_args = inspect.getargspec(methods['put']).args
+                req_index = func_args.index("request") if "request" in func_args else -1
+                res_index = func_args.index("response") if "response" in func_args else -1
+                if res_index > -1:
+                    args = args[:res_index] + (self, ) + args[res_index:]
+                    if req_index > -1:
+                        args = args[:req_index] + (self.request, ) + args[req_index:]
+                elif req_index > -1:
+                    args = args[:req_index] + (self.request, ) + args[req_index:]
                 self.write(methods['put'](*args, **kwargs))
         if 'patch' in methods.keys():
             def patch(self, *args, **kwargs):
-                if len(inspect.getargspec(methods['patch']).args) > 0 and \
-                        inspect.getargspec(methods['patch']).args[0] == 'request':
-                    args = (self.request, ) + args
+                func_args = inspect.getargspec(methods['patch']).args
+                req_index = func_args.index("request") if "request" in func_args else -1
+                res_index = func_args.index("response") if "response" in func_args else -1
+                if res_index > -1:
+                    args = args[:res_index] + (self, ) + args[res_index:]
+                    if req_index > -1:
+                        args = args[:req_index] + (self.request, ) + args[req_index:]
+                elif req_index > -1:
+                    args = args[:req_index] + (self.request, ) + args[req_index:]
                 self.write(methods['patch'](*args, **kwargs))
     return Handler
 

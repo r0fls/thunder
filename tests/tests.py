@@ -8,6 +8,11 @@ import tornado
 def hello():
     return "hello"
 
+@thunder.get('/headers')
+def headers(response):
+    response.set_header("hello", "world")
+    return "hello"
+
 @thunder.post()
 def echo(request):
     return request.body
@@ -40,6 +45,10 @@ class ThunderTests(AsyncHTTPTestCase):
     def test_http_get(self):
         response = self.fetch('/', method="GET")
         self.assertEqual(b"hello", response.body)
+
+    def test_http_headers_get(self):
+        response = self.fetch('/headers', method="GET")
+        self.assertEqual(b"world", response.headers["hello"])
 
     def test_http_post(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="POST")
