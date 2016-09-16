@@ -10,6 +10,23 @@ import re
 app = []
 env = tornado.web.Application()
 
+class Headers(dict):
+    def __init__(self, handler):
+        self.handler = handler
+        self.dict = dict()
+
+    def __setitem__(self, key, value):
+        self.handler.set_header(key, value)
+        self.dict[key] = value
+
+    def __getitem__(self, key):
+        return self.dict[key]
+
+class Response:
+    def __init__(self, handler):
+        self.handler = handler
+        self.headers = Headers(handler)
+        #self.cookies = Cookies(handler)
 
 def handler(methods):
     '''
@@ -23,7 +40,7 @@ def handler(methods):
                 req_index = func_args.index("request") if "request" in func_args else -1
                 res_index = func_args.index("response") if "response" in func_args else -1
                 if res_index > -1:
-                    args = args[:res_index] + (self, ) + args[res_index:]
+                    args = args[:res_index] + (Response(self), ) + args[res_index:]
                     if req_index > -1:
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
@@ -74,6 +91,8 @@ def get(path='/'):
     Adds a function and optional path to the global app variable
     '''
     def _get(func_to_decorate):
+        # these two lines aren't doing anything, could allow
+        # the get mathod to take more arguments (e.g. auth functions)
         def new_func(*original_args, **original_kwargs):
             return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'get', func_to_decorate]])

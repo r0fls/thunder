@@ -10,7 +10,7 @@ def hello():
 
 @thunder.get('/headers')
 def headers(response):
-    response.set_header("hello", "world")
+    response.headers["hello"] = "world"
     return "hello"
 
 @thunder.post()
