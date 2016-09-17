@@ -3,12 +3,22 @@ import tornado.web
 import inspect
 from collections import defaultdict
 import re
+import string
+import random
 
 # TODO
-# - Authentication
+# - Authentication functions
+# - Secure cookies
+
+# used to sign secure cookies
+# this should be configurable, since
+# multiple APIs may be working together via a LB
+LEN = 32
+chars = string.letters+string.digits
+secret = ''.join([chars[random.randrange(0, len(chars)-1)] for i in range(LEN)])
 
 app = []
-env = tornado.web.Application([],cookie_secret="someshit")
+env = tornado.web.Application([], cookie_secret=secret)
 
 # should add the other dict methods
 # these 3 classes should all point
@@ -39,18 +49,31 @@ class Headers(dict):
     def __getitem__(self, key):
         return self.dict[key]
 
-
-class Response:
+class Response(object):
+    # there is a better way to do this
     def __init__(self, handler):
         self.handler = handler
         self.headers = Headers(handler)
         self.cookies = Cookies(handler)
+        self._code = 204
+        self.reason = None
+
+    @property
+    def code(self):
+        return self._code
+
+    @code.setter
+    def code(self, value):
+        "setting status code"
+        self._code = value
+        self.handler.set_status(self._code, self.reason)
 
 def handler(methods):
     '''
     Returns a tornado handler with get method defined by the function passed
     via the get decorator
     '''
+
     class Handler(tornado.web.RequestHandler):
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
@@ -63,7 +86,11 @@ def handler(methods):
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
                     args = args[:req_index] + (self.request, ) + args[req_index:]
-                self.write(methods['get'](*args, **kwargs))
+                res = methods['get'](*args, **kwargs)
+                if res:
+                    self.write(res)
+                else:
+                    self.finish()
         if 'post' in methods.keys():
             def post(self, *args, **kwargs):
                 func_args = inspect.getargspec(methods['post']).args
@@ -75,7 +102,11 @@ def handler(methods):
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
                     args = args[:req_index] + (self.request, ) + args[req_index:]
-                self.write(methods['post'](*args, **kwargs))
+                res = methods['post'](*args, **kwargs)
+                if res:
+                    self.write(res)
+                else:
+                    self.finish()
         if 'put' in methods.keys():
             def put(self, *args, **kwargs):
                 func_args = inspect.getargspec(methods['put']).args
@@ -87,7 +118,11 @@ def handler(methods):
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
                     args = args[:req_index] + (self.request, ) + args[req_index:]
-                self.write(methods['put'](*args, **kwargs))
+                res = methods['put'](*args, **kwargs)
+                if res:
+                    self.write(res)
+                else:
+                    self.finish()
         if 'patch' in methods.keys():
             def patch(self, *args, **kwargs):
                 func_args = inspect.getargspec(methods['patch']).args
@@ -99,7 +134,11 @@ def handler(methods):
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
                     args = args[:req_index] + (self.request, ) + args[req_index:]
-                self.write(methods['patch'](*args, **kwargs))
+                res = methods['patch'](*args, **kwargs)
+                if res:
+                    self.write(res)
+                else:
+                    self.finish()
     return Handler
 
 

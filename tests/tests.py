@@ -8,6 +8,11 @@ import tornado
 def hello():
     return "hello"
 
+@thunder.get('/status')
+def hello_204(response):
+    response.code = 204
+    return
+
 @thunder.get('/headers')
 def headers(response):
     response.headers["hello"] = "world"
@@ -50,6 +55,10 @@ class ThunderTests(AsyncHTTPTestCase):
     def test_http_get(self):
         response = self.fetch('/', method="GET")
         self.assertEqual(b"hello", response.body)
+
+    def test_http_get_status(self):
+        response = self.fetch('/status', method="GET")
+        self.assertEqual(204, response.code)
 
     def test_http_headers_get(self):
         response = self.fetch('/headers', method="GET")
