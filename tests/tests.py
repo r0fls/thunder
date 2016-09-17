@@ -13,6 +13,11 @@ def headers(response):
     response.headers["hello"] = "world"
     return "hello"
 
+@thunder.get('/cookies')
+def cookies(response):
+    response.cookies["hello"] = "world"
+    return "hello"
+
 @thunder.post()
 def echo(request):
     return request.body
@@ -49,6 +54,10 @@ class ThunderTests(AsyncHTTPTestCase):
     def test_http_headers_get(self):
         response = self.fetch('/headers', method="GET")
         self.assertEqual("world", response.headers["hello"])
+
+    def test_http_cookies_get(self):
+        response = self.fetch('/cookies', method="GET")
+        self.assertEqual("hello=world", response.headers["Set-Cookie"].split(';')[0])
 
     def test_http_post(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="POST")

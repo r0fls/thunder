@@ -8,7 +8,24 @@ import re
 # - Authentication
 
 app = []
-env = tornado.web.Application()
+env = tornado.web.Application([],cookie_secret="someshit")
+
+# should add the other dict methods
+# these 3 classes should all point
+# to the same handler
+class Cookies(dict):
+    def __init__(self, handler):
+        self.handler = handler
+        # may not need this
+        self.dict = dict()
+
+    def __setitem__(self, key, value):
+        self.handler.set_cookie(key, value)
+        self.dict[key] = value
+
+    def __getitem__(self, key):
+        return self.dict[key]
+
 
 class Headers(dict):
     def __init__(self, handler):
@@ -22,11 +39,12 @@ class Headers(dict):
     def __getitem__(self, key):
         return self.dict[key]
 
+
 class Response:
     def __init__(self, handler):
         self.handler = handler
         self.headers = Headers(handler)
-        #self.cookies = Cookies(handler)
+        self.cookies = Cookies(handler)
 
 def handler(methods):
     '''
