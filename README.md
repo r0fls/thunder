@@ -12,7 +12,7 @@ See branch v0.1.0 for a stable release.
 def hello():
     return "hello, world"
 
-thunder.run()
+thunder.run(80)
 ```
 
 ```
@@ -25,7 +25,7 @@ $ curl localhost
 def hello(name):
     return "Hello, {}".format(name)
     
-thunder.run()
+thunder.run(80)
 ```
 
 ```
@@ -40,11 +40,28 @@ def hello(request, name):
     return "Hello, {name}. These are your headers: {headers}".format(name=name,
                                                                      headers=request.headers)
 
-thunder.run()
+thunder.run(80)
 ```
 
 ```
 $ curl localhost/hello/luke
+```
+
+**Using response object**
+
+```
+@thunder.get('/hello/{name}')
+def hello(response, name):
+    response.headers["hello"] = "world"
+    response.cookies["user"] = name
+    response.code = 204
+    return
+
+thunder.run(80)
+```
+
+```
+curl -i localhost/hello/wookie
 ```
 
 You can also use `post`, `put`, `delete` and `patch`.
