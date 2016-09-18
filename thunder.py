@@ -14,7 +14,7 @@ import random
 # this should be configurable, since
 # multiple APIs may be working together via a LB
 LEN = 32
-chars = string.letters+string.digits
+chars = string.ascii_letters+string.digits
 secret = ''.join([chars[random.randrange(0, len(chars)-1)] for i in range(LEN)])
 
 app = []
