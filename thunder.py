@@ -71,7 +71,7 @@ class Response(object):
 def handler(methods):
     '''
     Returns a tornado handler with get method defined by the function passed
-    via the get decorator
+    by the decorator
     '''
 
     class Handler(tornado.web.RequestHandler):
