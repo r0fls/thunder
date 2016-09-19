@@ -97,7 +97,7 @@ def handler(methods):
                 req_index = func_args.index("request") if "request" in func_args else -1
                 res_index = func_args.index("response") if "response" in func_args else -1
                 if res_index > -1:
-                    args = args[:res_index] + (self, ) + args[res_index:]
+                    args = args[:res_index] + (Response(self), ) + args[res_index:]
                     if req_index > -1:
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
@@ -113,7 +113,7 @@ def handler(methods):
                 req_index = func_args.index("request") if "request" in func_args else -1
                 res_index = func_args.index("response") if "response" in func_args else -1
                 if res_index > -1:
-                    args = args[:res_index] + (self, ) + args[res_index:]
+                    args = args[:res_index] + (Response(self), ) + args[res_index:]
                     if req_index > -1:
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:
@@ -129,7 +129,7 @@ def handler(methods):
                 req_index = func_args.index("request") if "request" in func_args else -1
                 res_index = func_args.index("response") if "response" in func_args else -1
                 if res_index > -1:
-                    args = args[:res_index] + (self, ) + args[res_index:]
+                    args = args[:res_index] + (Response(self), ) + args[res_index:]
                     if req_index > -1:
                         args = args[:req_index] + (self.request, ) + args[req_index:]
                 elif req_index > -1:

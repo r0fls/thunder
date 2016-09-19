@@ -27,6 +27,13 @@ def cookies(response):
 def echo(request):
     return request.body
 
+@thunder.post('/meta')
+def echo(request, response):
+    response.cookies['hello'] = 'world'
+    response.headers['hello'] = 'other world'
+    response.code = 204
+    return
+
 @thunder.patch()
 def echo(request):
     return request.body
@@ -71,6 +78,18 @@ class ThunderTests(AsyncHTTPTestCase):
     def test_http_post(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="POST")
         self.assertEqual({"testing":"12"}, json.loads(response.body.decode('utf8')))
+
+    def test_http_post_status(self):
+        response = self.fetch('/meta', body=json.dumps({"testing":"12"}), method="POST")
+        self.assertEqual(204, response.code)
+
+    def test_http_post_cookies(self):
+        response = self.fetch('/meta', body=json.dumps({"testing":"12"}), method="POST")
+        self.assertEqual("hello=world", response.headers["Set-Cookie"].split(';')[0])
+
+    def test_http_post_headers(self):
+        response = self.fetch('/meta', body=json.dumps({"testing":"12"}), method="POST")
+        self.assertEqual(b"other world", response.headers["Hello"])
 
     def test_http_put(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PUT")
