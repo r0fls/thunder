@@ -89,7 +89,7 @@ class ThunderTests(AsyncHTTPTestCase):
 
     def test_http_post_headers(self):
         response = self.fetch('/meta', body=json.dumps({"testing":"12"}), method="POST")
-        self.assertEqual(b"other world", response.headers["Hello"])
+        self.assertEqual("other world", response.headers["Hello"])
 
     def test_http_put(self):
         response = self.fetch('/', body=json.dumps({"testing":"12"}), method="PUT")
