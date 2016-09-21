@@ -18,7 +18,7 @@ chars = string.ascii_letters+string.digits
 secret = ''.join([chars[random.randrange(0, len(chars)-1)] for i in range(LEN)])
 
 app = []
-env = tornado.web.Application([], cookie_secret=secret)
+env = tornado.web.Application([], cookie_secret=secret, autoreload=True)
 
 # should add the other dict methods
 # these 3 classes should all point
