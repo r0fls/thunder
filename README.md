@@ -7,7 +7,7 @@ See branch v0.1.0 for a stable release.
 ##Examples
 
 **In tradition:**
-```
+```python
 @thunder.get()
 def hello():
     return "hello, world"
@@ -20,7 +20,7 @@ $ curl localhost
 ```
 
 **More interesting:**
-```
+```python
 @thunder.get('/hello/{name}')
 def hello(name):
     return "Hello, {}".format(name)
@@ -34,7 +34,7 @@ $ curl localhost/hello/luke
 
 **Using request object**
 
-```
+```python
 @thunder.get('/hello/{name}')
 def hello(request, name):
     return "Hello, {name}. These are your headers: {headers}".format(name=name,
@@ -49,7 +49,7 @@ $ curl localhost/hello/luke
 
 **Using response object**
 
-```
+```python
 @thunder.get('/hello/{name}')
 def hello(response, name):
     response.headers["hello"] = "world"
