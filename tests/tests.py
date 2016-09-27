@@ -13,6 +13,11 @@ def hello_204(response):
     response.code = 204
     return
 
+@thunder.get("/param")
+def param(request):
+    hello = request.query.split('=')[1]
+    return hello
+
 @thunder.get('/headers')
 def headers(response):
     response.headers["hello"] = "world"
@@ -62,6 +67,10 @@ class ThunderTests(AsyncHTTPTestCase):
     def test_http_get(self):
         response = self.fetch('/', method="GET")
         self.assertEqual(b"hello", response.body)
+
+    def test_http_get_param(self):
+        response = self.fetch('/param?hello=world', method="GET")
+        self.assertEqual(b"world", response.body)
 
     def test_http_get_status(self):
         response = self.fetch('/status', method="GET")
