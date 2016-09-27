@@ -55,7 +55,7 @@ class Response(object):
         self.handler = handler
         self.headers = Headers(handler)
         self.cookies = Cookies(handler)
-        self._code = 204
+        self._code = 200
         self.reason = None
 
     @property
@@ -75,70 +75,34 @@ def handler(methods):
     '''
 
     class Handler(tornado.web.RequestHandler):
+        def method_handler(self, methods, method, args, kwargs):
+            func_args = inspect.getargspec(methods[method]).args
+            req_index = func_args.index("request") if "request" in func_args else -1
+            res_index = func_args.index("response") if "response" in func_args else -1
+            if res_index > -1:
+                args = args[:res_index] + (Response(self), ) + args[res_index:]
+                if req_index > -1:
+                    args = args[:req_index] + (self.request, ) + args[req_index:]
+            elif req_index > -1:
+                args = args[:req_index] + (self.request, ) + args[req_index:]
+            res = methods[method](*args, **kwargs)
+            if res:
+                self.write(res)
+            else:
+                self.finish()
         if 'get' in methods.keys():
             def get(self, *args, **kwargs):
-                func_args = inspect.getargspec(methods['get']).args
-                req_index = func_args.index("request") if "request" in func_args else -1
-                res_index = func_args.index("response") if "response" in func_args else -1
-                if res_index > -1:
-                    args = args[:res_index] + (Response(self), ) + args[res_index:]
-                    if req_index > -1:
-                        args = args[:req_index] + (self.request, ) + args[req_index:]
-                elif req_index > -1:
-                    args = args[:req_index] + (self.request, ) + args[req_index:]
-                res = methods['get'](*args, **kwargs)
-                if res:
-                    self.write(res)
-                else:
-                    self.finish()
+                self.method_handler(methods, "get", args, kwargs)
         if 'post' in methods.keys():
             def post(self, *args, **kwargs):
-                func_args = inspect.getargspec(methods['post']).args
-                req_index = func_args.index("request") if "request" in func_args else -1
-                res_index = func_args.index("response") if "response" in func_args else -1
-                if res_index > -1:
-                    args = args[:res_index] + (Response(self), ) + args[res_index:]
-                    if req_index > -1:
-                        args = args[:req_index] + (self.request, ) + args[req_index:]
-                elif req_index > -1:
-                    args = args[:req_index] + (self.request, ) + args[req_index:]
-                res = methods['post'](*args, **kwargs)
-                if res:
-                    self.write(res)
-                else:
-                    self.finish()
+                self.method_handler(methods, "post", args, kwargs)
         if 'put' in methods.keys():
             def put(self, *args, **kwargs):
-                func_args = inspect.getargspec(methods['put']).args
-                req_index = func_args.index("request") if "request" in func_args else -1
-                res_index = func_args.index("response") if "response" in func_args else -1
-                if res_index > -1:
-                    args = args[:res_index] + (Response(self), ) + args[res_index:]
-                    if req_index > -1:
-                        args = args[:req_index] + (self.request, ) + args[req_index:]
-                elif req_index > -1:
-                    args = args[:req_index] + (self.request, ) + args[req_index:]
-                res = methods['put'](*args, **kwargs)
-                if res:
-                    self.write(res)
-                else:
-                    self.finish()
+                self.method_handler(methods, "put", args, kwargs)
         if 'patch' in methods.keys():
             def patch(self, *args, **kwargs):
-                func_args = inspect.getargspec(methods['patch']).args
-                req_index = func_args.index("request") if "request" in func_args else -1
-                res_index = func_args.index("response") if "response" in func_args else -1
-                if res_index > -1:
-                    args = args[:res_index] + (Response(self), ) + args[res_index:]
-                    if req_index > -1:
-                        args = args[:req_index] + (self.request, ) + args[req_index:]
-                elif req_index > -1:
-                    args = args[:req_index] + (self.request, ) + args[req_index:]
-                res = methods['patch'](*args, **kwargs)
-                if res:
-                    self.write(res)
-                else:
-                    self.finish()
+                self.method_handler(methods, "patch", args, kwargs)
+
     return Handler
 
 
@@ -150,8 +114,6 @@ def get(path='/'):
     def _get(func_to_decorate):
         # these two lines aren't doing anything, could allow
         # the get mathod to take more arguments (e.g. auth functions)
-        def new_func(*original_args, **original_kwargs):
-            return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'get', func_to_decorate]])
     return _get
 
@@ -160,8 +122,6 @@ def post(path='/'):
     Adds a function and optional path to the global app variable
     '''
     def _post(func_to_decorate):
-        def new_func(*original_args, **original_kwargs):
-            return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'post', func_to_decorate]])
     return _post
 
@@ -170,8 +130,6 @@ def put(path='/'):
     Adds a function and optional path to the global app variable
     '''
     def _put(func_to_decorate):
-        def new_func(*original_args, **original_kwargs):
-            return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'put', func_to_decorate]])
     return _put
 
@@ -180,8 +138,6 @@ def patch(path='/'):
     Adds a function and optional path to the global app variable
     '''
     def _patch(func_to_decorate):
-        def new_func(*original_args, **original_kwargs):
-            return func_to_decorate(*original_args, **original_kwargs)
         app.append([r".*", [path, 'patch', func_to_decorate]])
     return _patch
 
