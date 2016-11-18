@@ -20,13 +20,11 @@ secret = ''.join([chars[random.randrange(0, len(chars)-1)] for i in range(LEN)])
 app = []
 env = tornado.web.Application([], cookie_secret=secret, autoreload=True)
 
-# should add the other dict methods
-# these 3 classes should all point
-# to the same handler
+#TODO
+# define cookies and headers as properties of Response
 class Cookies(dict):
     def __init__(self, handler):
         self.handler = handler
-        # may not need this
         self.dict = dict()
 
     def __setitem__(self, key, value):
@@ -50,7 +48,6 @@ class Headers(dict):
         return self.dict[key]
 
 class Response(object):
-    # there is a better way to do this
     def __init__(self, handler):
         self.handler = handler
         self.headers = Headers(handler)
@@ -64,7 +61,6 @@ class Response(object):
 
     @code.setter
     def code(self, value):
-        "setting status code"
         self._code = value
         self.handler.set_status(self._code, self.reason)
 
